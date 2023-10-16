@@ -18,7 +18,7 @@ class UserAdmin(admin.ModelAdmin):
 class SubscribeAdmin(admin.ModelAdmin):
     """Отображение подписок в админке."""
     list_display = (
-        'id', 'user', 'author',  'created'
+        'id', 'user', 'author', 'created'
     )
     search_fields = ('author', 'created')
     list_filter = ('user', 'author', 'created')

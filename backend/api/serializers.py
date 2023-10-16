@@ -7,6 +7,7 @@ from rest_framework import serializers, status
 from recipes.models import (FavoriteRecipe, Ingredient, IngredientAmount,
                             Recipe, ShoppingCart, Tag)
 from users.models import CustomUser, Subscribe
+from .validators import recipe_validator
 
 
 class UserListSerializer(UserSerializer):
@@ -147,20 +148,14 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = '__all__'
         extra_kwargs = {'tags': {"error_messages": {
-            "does_not_exist": "Ошибка в Тэге, id = {pk_value} не существует"}}}
+            "does_not_exist": "Ошибка в Тэге, id = {pk_value} не существует"
+            }}}
 
     def validate(self, data):
-        """Проверка валидности."""
-        name = data.get('name')
         ingredients = data.get('ingredients')
         tags = data.get('tags')
         cooking_time = data.get('cooking_time')
         image = data.get('image')
-
-        if len(name) < 4:
-            raise serializers.ValidationError(
-                {'name': 'Название рецепта минимум 4 символа'}
-            )
 
         if not ingredients:
             raise serializers.ValidationError(
@@ -244,8 +239,8 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         """Обновление рецепта."""
         if 'tags' not in validated_data:
             raise serializers.ValidationError(
-                {'tags': 'Поле "tags" обязательно'},
-                status=status.HTTP_400_BAD_REQUEST
+                'Поле "tags" обязательно',
+                code=status.HTTP_400_BAD_REQUEST
             )
 
         if 'ingredients' in validated_data:
