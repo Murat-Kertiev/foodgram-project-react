@@ -146,9 +146,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = '__all__'
-        extra_kwargs = {'tags': {"error_messages": {
-            "does_not_exist": "Ошибка в Тэге, id = {pk_value} не существует"
-            }}}
 
     def validate(self, data):
         ingredients = data.get('ingredients')
