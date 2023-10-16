@@ -7,7 +7,6 @@ from rest_framework import serializers, status
 from recipes.models import (FavoriteRecipe, Ingredient, IngredientAmount,
                             Recipe, ShoppingCart, Tag)
 from users.models import CustomUser, Subscribe
-from .validators import recipe_validator
 
 
 class UserListSerializer(UserSerializer):

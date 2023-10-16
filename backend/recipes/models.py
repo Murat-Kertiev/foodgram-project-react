@@ -106,7 +106,9 @@ class Recipe(models.Model):
 
     def clean(self):
         if len(self.name) < 4:
-            raise ValidationError('Название рецепта должно содержать минимум 4 символа')
+            raise ValidationError(
+                'Название рецепта должно содержать минимум 4 символа'
+            )
 
     def save(self, *args, **kwargs):
         self.full_clean()
