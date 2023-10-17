@@ -81,4 +81,4 @@ Response status 200 OK ✅
 Python 3.9, Django 3.2, DRF, Nginx, Docker, Docker-compose, Postgresql.  
 <!-- 
 ***Cервер:***  
-https://foodgram.ddnsking.com/  
+https://foodgramm.ddnsking.com/  
