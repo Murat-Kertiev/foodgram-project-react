@@ -1,3 +1,5 @@
+"""Кастомная пагинация для приложения api."""
+
 from rest_framework.pagination import PageNumberPagination
 
 

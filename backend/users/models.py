@@ -1,3 +1,4 @@
+from core.const import EMAIL_FIELD_LENGTH, USERS_CHAR_FIELD_LENGTH
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -5,21 +6,21 @@ from django.db import models
 class CustomUser(AbstractUser):
     """Модель пользователя."""
     email = models.EmailField(
-        max_length=254,
+        max_length=EMAIL_FIELD_LENGTH,
         unique=True,
         verbose_name='Email',
     )
     username = models.CharField(
-        max_length=150,
+        max_length=USERS_CHAR_FIELD_LENGTH,
         unique=True,
         verbose_name='Логин',
     )
     first_name = models.CharField(
-        max_length=150,
+        max_length=USERS_CHAR_FIELD_LENGTH,
         verbose_name='Имя',
     )
     last_name = models.CharField(
-        max_length=150,
+        max_length=USERS_CHAR_FIELD_LENGTH,
         verbose_name='Фамилия',
     )
 
@@ -61,4 +62,4 @@ class Subscribe(models.Model):
         ]
 
     def __str__(self):
-        return (f'{self.user} - {self.author}')
+        return f'{self.user} - {self.author}'

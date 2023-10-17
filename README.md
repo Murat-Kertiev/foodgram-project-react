@@ -27,23 +27,23 @@ docker-compose exec backend python manage.py import_ingredients
 Если выполнены все импорты в базу данных:
 ```bash
 # Админ зона
-http://127.0.0.1/admin
+http://localhost/admin
 Login: admin
 Password: admin
 
 # Тестовый пользователь
-http://127.0.0.1/
+http://localhost/
 Email: kertiev1107@gmail.com
 Password: kurjh111
 
 # Документация
-http://127.0.0.1/redoc
+http://localhost/redoc
 ```
 **POSTMAN**  
 Для полноценного использования API необходимо выполнить регистрацию пользователя и получить токен. Инструкция для ***Postman:***
 
 Получить токен для тестового пользователя если выполнены все импорты:  
-POST http://127.0.0.1/api/auth/token/login/
+POST http://localhost/api/auth/token/login/
 ```json
 {
     "email": "kertievm04@gmail.com",
@@ -51,7 +51,7 @@ POST http://127.0.0.1/api/auth/token/login/
 }
 ```
 Без импортов, регистрируем нового пользователя  
-POST http://127.0.0.1/api/users/
+POST http://localhost/api/users/
 ```json
 {
     "email": "murik11@gmail.com",
@@ -62,7 +62,7 @@ POST http://127.0.0.1/api/users/
 }
 ```
 Получаем токен  
-POST http://127.0.0.1/api/auth/token/login/
+POST http://localhost/api/auth/token/login/
 ```json
 {
     "password": "qwerty12345",
@@ -82,4 +82,3 @@ Python 3.9, Django 3.2, DRF, Nginx, Docker, Docker-compose, Postgresql.
 <!-- 
 ***Cервер:***  
 https://foodgram.ddnsking.com/  
-https://foodgram.ddnsking.com/api/docs/ -->

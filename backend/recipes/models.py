@@ -1,7 +1,10 @@
+from colorfield.fields import ColorField
+from core.const import (MIN_COOKING_TIME, MIN_RECIPE_NAME,
+                        RECIPES_CHAR_FIELD_LENGTH, RECIPES_SLUG_FIELD_LENGTH)
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.core.exceptions import ValidationError
 
 User = get_user_model()
 
@@ -9,20 +12,17 @@ User = get_user_model()
 class Tag(models.Model):
     """Модель тега."""
     name = models.CharField(
-        max_length=200,
+        max_length=RECIPES_CHAR_FIELD_LENGTH,
         unique=True,
         verbose_name='Название тега',
     )
-    color = models.CharField(
-        max_length=7,
+    color = ColorField(
         default='#ffffff',
-        null=True,
-        blank=True,
         unique=True,
         verbose_name='Цвет тега',
     )
     slug = models.SlugField(
-        max_length=200,
+        max_length=RECIPES_SLUG_FIELD_LENGTH,
         unique=True,
         verbose_name='Слаг тега',
     )
@@ -39,11 +39,11 @@ class Tag(models.Model):
 class Ingredient(models.Model):
     """Модель ингредиента."""
     name = models.CharField(
-        max_length=200,
+        max_length=RECIPES_CHAR_FIELD_LENGTH,
         verbose_name='Название ингредиента',
     )
     measurement_unit = models.CharField(
-        max_length=200,
+        max_length=RECIPES_CHAR_FIELD_LENGTH,
         verbose_name='Единица измерения',
     )
 
@@ -83,15 +83,15 @@ class Recipe(models.Model):
         verbose_name='Изображение'
     )
     name = models.CharField(
-        max_length=200,
+        max_length=RECIPES_CHAR_FIELD_LENGTH,
         verbose_name='Название рецепта'
     )
     text = models.TextField(
         verbose_name='Описание рецепта'
     )
     cooking_time = models.PositiveIntegerField(
-        default=1,
-        validators=(MinValueValidator(1, 'Минимум 1 минута'),),
+        default=MIN_COOKING_TIME,
+        validators=(MinValueValidator(MIN_COOKING_TIME, 'Минимум 1 минута'),),
         verbose_name='Время приготовления'
     )
     pub_date = models.DateTimeField(
@@ -104,18 +104,18 @@ class Recipe(models.Model):
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
 
-    def clean(self):
-        if len(self.name) < 4:
-            raise ValidationError(
-                'Название рецепта должно содержать минимум 4 символа'
-            )
+    def __str__(self):
+        return self.name
 
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)
 
-    def __str__(self):
-        return self.name
+    def clean(self):
+        if len(self.name) < MIN_RECIPE_NAME:
+            raise ValidationError(
+                'Название рецепта должно содержать минимум 4 символа'
+            )
 
 
 class IngredientAmount(models.Model):
@@ -148,7 +148,7 @@ class IngredientAmount(models.Model):
                 name='unique ingredient')]
 
     def __str__(self):
-        return (f'{self.recipe} - {self.ingredient} - {self.amount}')
+        return f'{self.recipe} - {self.ingredient} - {self.amount}'
 
 
 class FavoriteRecipe(models.Model):
@@ -176,7 +176,7 @@ class FavoriteRecipe(models.Model):
                 name='unique favourite')]
 
     def __str__(self):
-        return (f'{self.user.username} - {self.favorite_recipe.name}')
+        return f'{self.user.username} - {self.favorite_recipe.name}'
 
 
 class ShoppingCart(models.Model):
@@ -204,4 +204,4 @@ class ShoppingCart(models.Model):
                 name='unique recipe in shopping cart')]
 
     def __str__(self):
-        return (f'{self.user.username} - {self.recipe.name}')
+        return f'{self.user.username} - {self.recipe.name}'

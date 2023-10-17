@@ -1,3 +1,5 @@
+"""Кастомные вьюсеты для приложения api."""
+
 from rest_framework import mixins, viewsets
 
 

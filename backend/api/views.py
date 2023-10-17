@@ -1,16 +1,14 @@
-from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
+from recipes.models import (FavoriteRecipe, Ingredient, Recipe, ShoppingCart,
+                            Tag)
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import (SAFE_METHODS, IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
-
-from recipes.models import (FavoriteRecipe, Ingredient, Recipe, ShoppingCart,
-                            Tag)
 from users.models import CustomUser, Subscribe
 
 from .filters import IngredientFilter, RecipesFilter
@@ -21,6 +19,7 @@ from .serializers import (FavoriteRecipeSerializer, IngredientSerializer,
                           SetPasswordSerializer, ShoppingCartSerializer,
                           SubscribeSerializer, TagSerializer,
                           UserCreateSerializer, UserListSerializer)
+from .utils import generate_shopping_list
 
 
 class CustomUserViewSet(UserViewSet):
@@ -133,6 +132,28 @@ class RecipeViewSet(viewsets.ModelViewSet):
         """Создание рецепта."""
         serializer.save(author=self.request.user)
 
+    def update(self, request, *args, **kwargs):
+        """Обновление рецепта."""
+        instance = self.get_object()
+        serializer = self.get_serializer(
+            instance,
+            data=request.data,
+            partial=True
+        )
+        if 'tags' not in request.data:
+            return Response(
+                {'tags': ['This field is required.']},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
     @action(
         detail=False,
         methods=('get',),
@@ -146,21 +167,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response(
                 'В корзине нет товаров', status=status.HTTP_400_BAD_REQUEST
             )
-
-        text = 'Список покупок:\n\n'
-        ingredient_name = 'recipe__recipe__ingredient__name'
-        ingredient_unit = 'recipe__recipe__ingredient__measurement_unit'
-        recipe_amount = 'recipe__recipe__amount'
-        amount_sum = 'recipe__recipe__amount__sum'
-        cart = user.shopping_cart.select_related('recipe').values(
-            ingredient_name, ingredient_unit).annotate(Sum(
-                recipe_amount)).order_by(ingredient_name)
-        for _ in cart:
-            text += (
-                f'{_[ingredient_name]} ({_[ingredient_unit]})'
-                f' — {_[amount_sum]}\n'
-            )
-        response = HttpResponse(text, content_type='text/plain')
+        response = HttpResponse(
+            generate_shopping_list(user),
+            content_type='text/plain'
+        )
         filename = 'shopping_list.txt'
         response['Content-Disposition'] = f'attachment; filename={filename}'
         return response
@@ -247,6 +257,5 @@ class ShoppingCartViewSet(CreateDestroyViewSet):
                 {'errors': 'Рецепта нет в корзине'},
                 status=status.HTTP_404_NOT_FOUND
             )
-
         cart_item.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

@@ -15,7 +15,7 @@ services:
       - ../.env
 
   backend:
-    image: marty1107/foodgram_backend
+    image: marty1107/foodgram_backend:latest
     restart: always
     volumes:
       - static_value:/app/static/
@@ -26,7 +26,7 @@ services:
       - ../.env
 
   frontend:
-    image: marty1107/foodgram_frontend
+    image: marty1107/foodgram_frontend:latest
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:

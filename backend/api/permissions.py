@@ -1,3 +1,5 @@
+"""Кастомные пермишены для приложения api."""
+
 from rest_framework import permissions
 
 
